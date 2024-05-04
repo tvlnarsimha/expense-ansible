@@ -18,7 +18,7 @@
       state: installed
       loop:
       - nodejs
-      -mysql
+      - mysql
 
 
   
@@ -76,7 +76,7 @@
       name: backend
       state: started
       enabled: yes
-      
+
 
 
 
