@@ -1,0 +1,54 @@
+- name: configure db server
+  hosts: db
+  become: yes
+  vars:
+    login_host: db.tvlnarsimha.online
+  vars_prompt:
+  - name: mysql_root_password
+    prompt: Please enter mysql root password
+    private: no
+  tasks:
+  - name: Install Mysql server
+    ansible.builtin.dnf:
+      name:mysql-server
+      state: latest
+
+  - name: start and enable mysql server
+    ansible.buitin.service:
+      name: mysqlid
+      state: started
+      enabled: yes
+
+  - name: install python mysql dependencies
+    ansible.builtin.pip:
+      name:
+      - PyMySQL
+      - cryptography
+      executable: pip3.9
+  # check password is already setup or not 
+  - name: check DB connection
+    community.mysql.mysql_info:
+      login_user: root
+      login_password: "{{ mysql_root_password }}" 
+      login_host: "{{ login_host }}"
+      filter: version
+    ignore_errors: yes
+    register: mysql_connection_output
+
+
+
+  - name: print output
+    ansible.buitin.debug:
+      msg: "output: {{ my_sql_connection_output }} "
+
+  - name: setup root password
+    ansible.builtin.command: "mysql_secure_installation --set-root-pass {{ my_sql_root_password }}"
+    when: mysql_connection_output.failed is true # don't give {{ }} in when condition
+
+
+
+
+
+
+
+
